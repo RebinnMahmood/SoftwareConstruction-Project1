@@ -9,29 +9,23 @@ if (!$data) {
     exit;
 }
 
-// Find doctor and patient IDs
-$doctor_email = $data['doctor_email'] ?? '';
+// ✅ FIX: Extract duplicate code into reusable function
+function getUserIdByEmailAndRole($conn, $email, $role) {
+    $stmt = $conn->prepare("SELECT id FROM users WHERE email=? AND role=?");
+    $stmt->bind_param("ss", $email, $role);
+    $stmt->execute();
+    $stmt->bind_result($id);
+    $stmt->fetch();
+    $stmt->close();
+    return $id;
+}
+
+// Now reuse the function instead of repeating code
+$doctor_email  = $data['doctor_email'] ?? '';
 $patient_email = $data['email'] ?? '';
 
-$doctor_id = null;
-$patient_id = null;
-
-if ($doctor_email) {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email=? AND role='doctor'");
-    $stmt->bind_param("s", $doctor_email);
-    $stmt->execute();
-    $stmt->bind_result($doctor_id);
-    $stmt->fetch();
-    $stmt->close();
-}
-if ($patient_email) {
-    $stmt = $conn->prepare("SELECT id FROM users WHERE email=? AND role='patient'");
-    $stmt->bind_param("s", $patient_email);
-    $stmt->execute();
-    $stmt->bind_result($patient_id);
-    $stmt->fetch();
-    $stmt->close();
-}
+$doctor_id  = getUserIdByEmailAndRole($conn, $doctor_email, 'doctor');
+$patient_id = getUserIdByEmailAndRole($conn, $patient_email, 'patient');
 
 if (!$doctor_id || !$patient_id) {
     echo json_encode(["status" => "error", "message" => "Doctor or patient not found"]);

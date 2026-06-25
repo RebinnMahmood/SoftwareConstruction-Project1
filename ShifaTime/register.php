@@ -9,15 +9,40 @@ if (!$data) {
     exit;
 }
 
-$name = $data['name'];
-$email = $data['email'];
-$password = $data['password'];
-$role = $data['role'];
+// ✅ FIX 1: Input Validation added
+$name = trim($data['name'] ?? '');
+$email = trim($data['email'] ?? '');
+$password = $data['password'] ?? '';
+$role = $data['role'] ?? '';
 $specialization = $data['specialization'] ?? null;
 $degree = $data['degree'] ?? null;
 $location = $data['location'] ?? null;
 $phone = $data['phone'] ?? null;
 $image = $data['image'] ?? null;
+
+// Validate name
+if (empty($name)) {
+    echo json_encode(["status" => "error", "message" => "Name is required"]);
+    exit;
+}
+
+// Validate email format
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(["status" => "error", "message" => "Invalid email format"]);
+    exit;
+}
+
+// Validate password length
+if (strlen($password) < 6) {
+    echo json_encode(["status" => "error", "message" => "Password must be at least 6 characters"]);
+    exit;
+}
+
+// Validate role
+if (!in_array($role, ['patient', 'doctor'])) {
+    echo json_encode(["status" => "error", "message" => "Invalid role"]);
+    exit;
+}
 
 // Prevent duplicate email
 $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
@@ -30,8 +55,11 @@ if ($stmt->num_rows > 0) {
 }
 $stmt->close();
 
+// ✅ FIX 2: Hash password before storing
+$hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
 $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, specialization, degree, location, phone, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("sssssssss", $name, $email, $password, $role, $specialization, $degree, $location, $phone, $image);
+$stmt->bind_param("sssssssss", $name, $email, $hashedPassword, $role, $specialization, $degree, $location, $phone, $image);
 
 if ($stmt->execute()) {
     echo json_encode(["status" => "success"]);

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShifaTime - Booking</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<header>
+  <div class="container header-container">
+    <a href="#" class="logo" onclick="redirectBasedOnRole()">Shifa<span>Time</span></a>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="doctors.html" class="active">Doctors</a></li>
+        <li><a href="blogs.html">Blogs</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions" id="headerActions"></div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <h1 id="doctorNameHeading">Booking</h1>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> &raquo;
+      <a href="doctors.html">Our Doctors</a> &raquo;
+      <span id="breadcrumbDoctorName">Doctor</span>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="detail-card">
+    <div class="detail-photo">
+      <img id="doctorImage" src="" alt="Doctor Photo">
+    </div>
+    <div class="detail-info">
+      <span class="dept-label" id="doctorDepartment">Specialist</span>
+      <h2 id="doctorFullName">Doctor Name <i class="fas fa-circle"></i></h2>
+      <ul class="info-list">
+        <li id="doctorDegree"></li>
+        <li id="doctorLocation"></li>
+        <li id="doctorPhone"></li>
+      </ul>
+    </div>
+    <aside class="detail-aside">
+      <div class="joined"><i class="fas fa-history"></i> Joined us: <strong>1 Year</strong></div>
+      <div class="fees"><i class="fas fa-dollar-sign"></i> Fees: <strong id="doctorFee">100</strong></div>
+      <div class="social-icons">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </aside>
+  </div>
+
+  <ul class="tabs">
+    <li>Overview</li>
+    <li class="active">Booking</li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="legend">
+      <span class="available">Available</span>
+      <span class="booked">Booked</span>
+      <span class="selected">Selected</span>
+    </div>
+    <h3>Choose Your Date &amp; Time</h3>
+    <div style="text-align:right; margin-bottom:1rem;">
+      <button class="btn btn-outline" id="selectDateBtn">Select Date</button>
+    </div>
+    <div class="slots" id="slotsContainer">
+      <div class="slot">10:00 am</div>
+      <div class="slot">10:15 am</div>
+      <div class="slot">10:30 am</div>
+      <div class="slot">10:45 am</div>
+    </div>
+
+    <div class="booking-grid">
+      <div class="appointment-form">
+        <input type="text" id="patientName" placeholder="Enter Name">
+        <input type="text" id="patientAge" placeholder="Enter Age">
+        <input type="email" id="patientEmail" placeholder="Enter E-mail">
+        <div style="display:flex;">
+          <span style="background:#eee;padding:.75rem;border:1px solid #ddd;border-radius:8px 0 0 8px;">+964</span>
+          <input type="text" id="patientPhone" placeholder="Enter Mobile Number" style="flex:1;border-left:none;border-radius:0 8px 8px 0;">
+        </div>
+        <textarea id="patientDetails" placeholder="Enter Disease Details"></textarea>
+        <button class="btn btn-primary" id="bookBtn">Book Appointment</button>
+      </div>
+
+      <div class="confirm-box" id="confirmBox">
+        <h4>Confirm Your Booking</h4>
+        <p><strong>Patient Name:</strong> <span id="confirmName"></span></p>
+        <p><strong>Age:</strong> <span id="confirmAge"></span> Years</p>
+        <p><strong>Email:</strong> <span id="confirmEmail"></span></p>
+        <p><strong>Phone Number:</strong> <span id="confirmPhone"></span></p>
+        <p><strong>Date & Slot:</strong> <span id="confirmSlot"></span></p>
+        <p><strong>Fees:</strong> <span id="confirmFeeDisplay"></span></p>
+        <button class="btn btn-outline" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="emergency-bar">
+    <div class="emergency-item"><i class="fas fa-phone-alt"></i> Emergency Call (+964)7701475201</div>
+    <div>OR</div>
+    <div class="emergency-item"><i class="fas fa-envelope"></i> info@shifatime.com</div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="col">
+      <h4>ShifaTime</h4>
+      <p>Providing exceptional healthcare since 2025.</p>
+    </div>
+    <div class="col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="doctors.html">Doctors</a></li>
+        <li><a href="blogs.html">Blogs</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="col">
+      <h4>Contact</h4>
+      <p>Erbil</p>
+      <p>Phone: (+964)7701475201</p>
+      <p>Email: info@shifatime.com</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function redirectBasedOnRole() {
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  window.location.href = user?.role === "admin" ? 'admin.html' : 'index.html';
+}
+
+function loadDoctorData() {
+  const doctor = JSON.parse(localStorage.getItem('selectedDoctor'));
+  if (!doctor) return;
+
+  document.getElementById("doctorImage").src = doctor.image;
+  document.getElementById("doctorFullName").textContent = doctor.name;
+  document.getElementById("doctorDepartment").textContent = doctor.department;
+  document.getElementById("doctorDegree").textContent = doctor.degree;
+  document.getElementById("doctorLocation").textContent = doctor.location;
+  document.getElementById("doctorPhone").textContent = doctor.phone;
+  document.getElementById("doctorFee").textContent = doctor.fee;
+  document.getElementById("doctorNameHeading").textContent = `Booking with ${doctor.name}`;
+  document.getElementById("breadcrumbDoctorName").textContent = doctor.name;
+}
+
+let selectedSlot = "";
+document.addEventListener('DOMContentLoaded', () => {
+  // LOGIN CHECK
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser) {
+    document.querySelector('.appointment-form').innerHTML = '<div style="color:red;text-align:center;font-weight:bold;">You must <a href="login.html">login</a> to book an appointment.</div>';
+    return;
+  } else {
+    // Prefill patient info
+    document.getElementById('patientName').value = currentUser.name || '';
+    document.getElementById('patientEmail').value = currentUser.email || '';
+  }
+
+  loadDoctorData();
+
+  const slots = document.querySelectorAll('.slot');
+  const inputs = ['patientName','patientAge','patientEmail','patientPhone','patientDetails'];
+
+  slots.forEach(slot => {
+    slot.addEventListener('click', () => {
+      slots.forEach(s => s.classList.remove('selected'));
+      slot.classList.add('selected');
+      selectedSlot = slot.textContent.trim();
+      document.getElementById('confirmSlot').textContent = selectedSlot;
+    });
+  });
+
+  inputs.forEach(id => {
+    const inputEl = document.getElementById(id);
+    inputEl.addEventListener('input', () => {
+      const confirmId = 'confirm' + id.charAt(0).toUpperCase() + id.slice(1);
+      if (document.getElementById(confirmId)) {
+        document.getElementById(confirmId).textContent = inputEl.value;
+      }
+    });
+  });
+
+  // Update fee display in confirm box
+  document.getElementById('confirmFeeDisplay').textContent = document.getElementById('doctorFee').textContent;
+
+  document.getElementById('bookBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const doctor = JSON.parse(localStorage.getItem("selectedDoctor"));
+    // Validate all fields
+    const patientName = document.getElementById('patientName').value.trim();
+    const patientAge = document.getElementById('patientAge').value.trim();
+    const patientEmail = document.getElementById('patientEmail').value.trim();
+    const patientPhone = document.getElementById('patientPhone').value.trim();
+    const patientDetails = document.getElementById('patientDetails').value.trim();
+    const fee = parseFloat(document.getElementById('doctorFee').textContent);
+    if (!selectedSlot) return alert("❗ Please select a time slot.");
+    if (!patientName || !patientAge || !patientEmail || !patientPhone || !patientDetails) {
+      alert('❌ Please fill in all fields.');
+      return;
+    }
+    if (isNaN(parseInt(patientAge)) || parseInt(patientAge) <= 0) {
+      alert('❌ Please enter a valid age.');
+      return;
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(patientEmail)) {
+      alert('❌ Please enter a valid email address.');
+      return;
+    }
+    if (!/^\d{7,15}$/.test(patientPhone)) {
+      alert('❌ Please enter a valid phone number.');
+      return;
+    }
+    // Ensure patient exists in DB
+    try {
+      const ensureRes = await fetch('ensure_patient.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email: patientEmail, name: patientName })
+      });
+      const ensureResult = await ensureRes.json();
+      if (ensureResult.status === 'error') {
+        alert('❌ ' + (ensureResult.message || 'Failed to verify patient.'));
+        return;
+      }
+    } catch (err) {
+      alert('❌ Failed to verify patient.');
+      return;
+    }
+    // Ensure doctor exists in DB
+    try {
+      const ensureDocRes = await fetch('ensure_doctor.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          email: doctor.email,
+          name: doctor.name,
+          specialization: doctor.department,
+          degree: doctor.degree,
+          location: doctor.location,
+          phone: doctor.phone,
+          image: doctor.image
+        })
+      });
+      const ensureDocResult = await ensureDocRes.json();
+      if (ensureDocResult.status === 'error') {
+        alert('❌ ' + (ensureDocResult.message || 'Failed to verify doctor.'));
+        return;
+      }
+    } catch (err) {
+      alert('❌ Failed to verify doctor.');
+      return;
+    }
+    const appointment = {
+      doctor_name: doctor.name,
+      doctor_email: doctor.email,
+      patient_name: patientName,
+      age: parseInt(patientAge),
+      email: patientEmail,
+      phone: patientPhone,
+      details: patientDetails,
+      slot: selectedSlot,
+      fee: fee
+    };
+    try {
+      const res = await fetch('book_appointment.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(appointment)
+      });
+      const result = await res.json();
+      if (result.status === "success") {
+        alert("✅ Appointment booked successfully!");
+        // Optionally reset form or redirect
+      } else {
+        alert("❌ Error: " + result.message);
+      }
+    } catch (err) {
+      alert("❌ Failed to book appointment.");
+      console.error(err);
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    inputs.forEach(id => document.getElementById(id).value = '');
+    selectedSlot = '';
+    slots.forEach(s => s.classList.remove('selected'));
+    ['Name','Age','Email','Phone','Slot','FeeDisplay'].forEach(suffix => {
+      if (document.getElementById('confirm' + suffix)) {
+        document.getElementById('confirm' + suffix).textContent = '';
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

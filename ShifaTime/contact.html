@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShifaTime - Contact Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .info-cards {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 40px;
+      padding: 60px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+    .info-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      width: 250px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container header-container">
+      <a href="index.html" class="logo">Shifa<span>Time</span></a>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="contact.html" class="active">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions"></div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <h1>Contact Us</h1>
+      <div class="breadcrumb"><a href="index.html">Home</a> &raquo; <span>Contact Us</span></div>
+    </div>
+  </section>
+
+  <!-- Info Cards -->
+  <div class="container">
+    <div class="info-cards">
+      <div class="info-card">
+        <i class="fas fa-headset"></i>
+        <h4>Mobile Number</h4>
+        <p>(+964)7701475201</p>
+      </div>
+      <div class="info-card">
+        <i class="fas fa-envelope"></i>
+        <h4>E-mail</h4>
+        <p>shifaTime@gmail.com</p>
+      </div>
+      <div class="info-card">
+        <i class="fas fa-map-marker-alt"></i>
+        <h4>Address</h4>
+        <p>Near Makhmur Square, 100 m Road, Erbil, Erbil Governorate</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Form Section -->
+  <div class="container contact-form-section">
+    <h2>Stay Connect With Us</h2>
+    <p>Please join the discussion and be connect with us.</p>
+
+    <form class="contact-form" id="contactForm">
+      <div class="form-grid">
+        <input type="text" id="contactName" placeholder="Your Name" required />
+        <input type="email" id="contactEmail" placeholder="Your Email" required />
+        <input type="text" id="contactSubject" placeholder="Subject" required />
+        <textarea id="contactMessage" placeholder="Your Message" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+  </div>
+
+  <!-- Emergency Bar -->
+  <div class="container">
+    <div class="emergency-bar">
+      <div class="emergency-item"><i class="fas fa-phone-alt"></i> Emergency Call (+964)7701475201</div>
+      <div>OR</div>
+      <div class="emergency-item"><i class="fas fa-envelope"></i> info@shifatime.com</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="col">
+        <h4>ShifaTime</h4>
+        <p>Providing exceptional healthcare since 2025.</p>
+      </div>
+      <div class="col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>Contact</h4>
+        <p>Erbil</p>
+        <p>Phone: (+964)7701475201</p>
+        <p>Email: info@shifatime.com</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JS should be at bottom -->
+  <script src="js/main.js"></script>
+</body>
+</html>

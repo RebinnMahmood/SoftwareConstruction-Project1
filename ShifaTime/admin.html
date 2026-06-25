@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - ShifaTime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    body { background: #f7f8fa; font-family: 'Poppins', sans-serif; }
+    .dashboard-cards { display: flex; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; }
+    .dashboard-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 2rem 2.5rem;
+      min-width: 180px;
+      flex: 1;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 1rem;
+      transition: box-shadow 0.2s;
+    }
+    .dashboard-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.13); }
+    .dashboard-card .fa { font-size: 2rem; margin-bottom: 0.5rem; color: #ff6b6b; }
+    .table { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    th, td { padding: 12px 10px; }
+    th { background: #ff6b6b; color: #fff; }
+    tr:nth-child(even) td { background: #f9f9f9; }
+    .btn { border-radius: 6px; margin: 2px; transition: background 0.2s; }
+    .btn:hover { background: #ff6b6b; color: #fff; }
+    .modal-bg { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center; }
+    .modal { background:#fff; border-radius:10px; padding:2rem; min-width:300px; box-shadow:0 2px 16px rgba(0,0,0,0.15); }
+    .modal input, .modal select { width:100%; margin-bottom:1rem; padding:8px; border-radius:6px; border:1px solid #ccc; }
+    .modal-actions { text-align:right; }
+    .spinner { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:2000; }
+    .spinner .fa { font-size:2.5rem; color:#ff6b6b; animation:spin 1s linear infinite; }
+    .confirm-modal { text-align:center; }
+    .confirm-modal .btn { min-width: 80px; }
+    @keyframes spin { 100% { transform:rotate(360deg); } }
+    @media (max-width: 900px) { .dashboard-cards { flex-direction: column; } }
+    @media (max-width: 600px) { .modal { min-width: 90vw; } }
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.4s;
+    }
+    .toast-success { background: #4caf50; }
+    .toast-error { background: #ff5252; }
+  </style>
+</head>
+<body>
+
+<!-- Admin Header -->
+<header>
+  <div class="container header-container">
+    <a href="admin.html" class="logo">Shifa<span>Time</span></a>
+    <nav>
+      <ul>
+        <li><a href="admin.html" class="active">Admin Panel</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <span id="loggedInUserName"></span>
+      <a href="profile.html" class="btn btn-outline">Profile</a>
+      <button class="btn btn-primary" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</header>
+
+<!-- Admin Content -->
+<div class="container" style="margin-top: 40px;">
+  <h2>Admin Dashboard</h2>
+
+  <div class="dashboard-cards">
+    <div class="dashboard-card"><i class="fa fa-users"></i><div id="statTotalUsers">0</div><div>Users</div></div>
+    <div class="dashboard-card"><i class="fa fa-user-md"></i><div id="statDoctors">0</div><div>Doctors</div></div>
+    <div class="dashboard-card"><i class="fa fa-user"></i><div id="statPatients">0</div><div>Patients</div></div>
+    <div class="dashboard-card"><i class="fa fa-calendar-check"></i><div id="statAppointments">0</div><div>Appointments</div></div>
+  </div>
+
+  <!-- Users Table -->
+  <section>
+    <h3>Manage Users</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- Will be populated dynamically later -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Appointments Table -->
+  <section style="margin-top: 40px;">
+    <h3>Manage Appointments</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="appointmentTableBody">
+        <!-- Will be populated dynamically later -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Reports -->
+  <section style="margin-top: 40px;">
+    <h4>Reports</h4>
+    <p>Total Users: <span id="totalUsers">0</span></p>
+    <p>Total Appointments: <span id="totalAppointments">0</span></p>
+  </section>
+
+  <!-- Feedback Table -->
+  <section style="margin-top: 40px;">
+    <h4>Monitor Feedback</h4>
+    <table class="table">
+      <thead>
+        <tr><th>User</th><th>Message</th><th>Date</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="feedbackTableBody">
+        <!-- Feedback rows -->
+      </tbody>
+    </table>
+  </section>
+  <!-- Website Settings -->
+  <section style="margin-top: 40px;">
+    <h4>Website Settings</h4>
+    <form id="settingsForm">
+      <label>Site Title: <input type="text" id="siteTitle" value="ShifaTime" /></label><br><br>
+      <label>Contact Email: <input type="email" id="siteEmail" value="info@shifatime.com" /></label><br><br>
+      <button type="submit" class="btn btn-primary">Save Settings</button>
+    </form>
+  </section>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="col">
+      <h4>ShifaTime</h4>
+      <p>Admin Panel Interface</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Modal for all edit/confirm actions -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- Spinner -->
+<div class="spinner" id="spinner">
+  <i class="fa fa-spinner fa-spin"></i>
+</div>
+
+<script>
+function logout() {
+  localStorage.removeItem('currentUser');
+  window.location.href = 'login.html';
+}
+
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!currentUser || currentUser.role !== 'admin') {
+  window.location.href = 'login.html';
+} else {
+  document.getElementById('loggedInUserName').textContent = currentUser.name;
+}
+
+// --- Admin Dashboard Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Show spinner while loading
+    const spinner = document.getElementById('spinner');
+    function showSpinner() { spinner.style.display = 'block'; }
+    function hideSpinner() { spinner.style.display = 'none'; }
+
+    // USERS MANAGEMENT
+    async function loadUsers(filter = '') {
+      showSpinner();
+      const res = await fetch('get_users.php');
+      const users = await res.json();
+      const tbody = document.getElementById('userTableBody');
+      tbody.innerHTML = '';
+      let doctorCount = 0, patientCount = 0;
+      users.filter(user =>
+        user.name.toLowerCase().includes(filter.toLowerCase()) ||
+        user.email.toLowerCase().includes(filter.toLowerCase()) ||
+        user.role.toLowerCase().includes(filter.toLowerCase())
+      ).forEach((user, idx) => {
+        if(user.role === 'doctor') doctorCount++;
+        if(user.role === 'patient') patientCount++;
+        tbody.innerHTML += `
+          <tr>
+            <td>${user.name}</td>
+            <td>${user.email}</td>
+            <td>${user.role}</td>
+            <td>
+              <button class="btn btn-outline" onclick="openUserModal(${user.id}, '${user.name}', '${user.role}')">Edit</button>
+              <button class="btn btn-outline" onclick="deleteUser(${user.id})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+      document.getElementById('totalUsers').textContent = users.length;
+      document.getElementById('statTotalUsers').textContent = users.length;
+      document.getElementById('statDoctors').textContent = doctorCount;
+      document.getElementById('statPatients').textContent = patientCount;
+      hideSpinner();
+    }
+    window.openUserModal = function(id, name, role) {
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `
+        <h3>Edit User</h3>
+        <label>Name:<input id='editUserName' value='${name}' /></label><br><br>
+        <label>Role:
+          <select id='editUserRole'>
+            <option value='admin' ${role==='admin'?'selected':''}>Admin</option>
+            <option value='doctor' ${role==='doctor'?'selected':''}>Doctor</option>
+            <option value='patient' ${role==='patient'?'selected':''}>Patient</option>
+          </select>
+        </label><br><br>
+        <div class='modal-actions'>
+          <button class='btn btn-primary' onclick='saveUserEdit(${id})'>Save</button>
+          <button class='btn' onclick='closeModal()'>Cancel</button>
+        </div>
+      `;
+      document.getElementById('modalBg').style.display = 'flex';
+    }
+    window.saveUserEdit = async function(id) {
+      const name = document.getElementById('editUserName').value;
+      const role = document.getElementById('editUserRole').value;
+      showSpinner();
+      await fetch('update_user.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name, role })
+      });
+      closeModal();
+      await loadUsers();
+      showToast('User updated successfully.');
+    }
+    window.deleteUser = function(id) {
+      showConfirm('Are you sure you want to delete this user?', async () => {
+        showSpinner();
+        await fetch('delete_user.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        closeModal();
+        await loadUsers();
+        showToast('User deleted successfully.');
+      });
+    }
+    function showConfirm(msg, onYes) {
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `<div class='confirm-modal'><p>${msg}</p><div class='modal-actions'><button class='btn btn-primary' onclick='confirmYes()'>Yes</button><button class='btn' onclick='closeModal()'>No</button></div></div>`;
+      document.getElementById('modalBg').style.display = 'flex';
+      window.confirmYes = function() { closeModal(); onYes(); };
+    }
+
+    // APPOINTMENTS MANAGEMENT
+    async function loadAppointments(filter = '') {
+      showSpinner();
+      const res = await fetch('get_appointments.php');
+      const appointments = await res.json();
+      const tbody = document.getElementById('appointmentTableBody');
+      tbody.innerHTML = '';
+      appointments.filter(app =>
+        app.patient_name?.toLowerCase().includes(filter.toLowerCase()) ||
+        app.doctor_name?.toLowerCase().includes(filter.toLowerCase()) ||
+        app.status?.toLowerCase().includes(filter.toLowerCase())
+      ).forEach((app, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${app.patient_name}</td>
+            <td>${app.doctor_name}</td>
+            <td>${app.slot ? app.slot.split(' ')[0] : ''}</td>
+            <td>${app.slot ? app.slot.split(' ')[1] || app.slot : ''}</td>
+            <td>
+              <select onchange="updateStatus(${app.id}, this.value)">
+                <option value="Pending" ${app.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                <option value="Confirmed" ${app.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="Cancelled" ${app.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+              <button class="btn btn-outline" onclick="openAppointmentModal(${app.id}, '${app.slot}', '${app.details||''}')">Edit</button>
+              <button class="btn btn-outline" onclick="deleteAppointment(${app.id})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+      document.getElementById('totalAppointments').textContent = appointments.length;
+      document.getElementById('statAppointments').textContent = appointments.length;
+      hideSpinner();
+    }
+    window.openAppointmentModal = function(id, slot, details) {
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `
+        <h3>Edit Appointment</h3>
+        <label>Slot:<input id='editAppSlot' value='${slot}' /></label><br><br>
+        <label>Details:<input id='editAppDetails' value='${details||''}' /></label><br><br>
+        <div class='modal-actions'>
+          <button class='btn btn-primary' onclick='saveAppointmentEdit(${id})'>Save</button>
+          <button class='btn' onclick='closeModal()'>Cancel</button>
+        </div>
+      `;
+      document.getElementById('modalBg').style.display = 'flex';
+    }
+    window.saveAppointmentEdit = async function(id) {
+      const slot = document.getElementById('editAppSlot').value;
+      const details = document.getElementById('editAppDetails').value;
+      showSpinner();
+      await fetch('update_appointment.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, slot, details })
+      });
+      closeModal();
+      await loadAppointments();
+      showToast('Appointment updated successfully.');
+    }
+    window.deleteAppointment = function(id) {
+      showConfirm('Are you sure you want to delete this appointment?', async () => {
+        showSpinner();
+        await fetch('delete_appointment.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        closeModal();
+        await loadAppointments();
+        showToast('Appointment deleted successfully.');
+      });
+    }
+    window.updateStatus = async function(id, status) {
+      showSpinner();
+      await fetch('update_appointment.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status })
+      });
+      await loadAppointments();
+      showToast('Appointment status updated.');
+    }
+
+    // FEEDBACK MANAGEMENT
+    async function loadFeedback() {
+      const res = await fetch('get_feedback.php');
+      const feedbacks = await res.json();
+      const tbody = document.getElementById('feedbackTableBody');
+      tbody.innerHTML = '';
+      feedbacks.forEach((fb, idx) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${fb.user}</td>
+            <td>${fb.message}</td>
+            <td>${fb.date}</td>
+            <td><button class='btn btn-outline' onclick='deleteFeedback(${fb.id})'>Delete</button></td>
+          </tr>
+        `;
+      });
+    }
+    window.deleteFeedback = async function(id) {
+      showConfirm('Are you sure you want to delete this feedback?', async () => {
+        showSpinner();
+        await fetch('delete_feedback.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        closeModal();
+        await loadFeedback();
+        showToast('Feedback deleted successfully.');
+      });
+    }
+
+    // WEBSITE SETTINGS
+    document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const siteTitle = document.getElementById('siteTitle').value;
+      const siteEmail = document.getElementById('siteEmail').value;
+      showSpinner();
+      const res = await fetch('save_settings.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ siteTitle, siteEmail })
+      });
+      const data = await res.json();
+      hideSpinner();
+      if (data.status === 'success') {
+        showToast('Settings saved!', 'success');
+      } else {
+        showToast('Failed to save settings: ' + (data.message || 'Unknown error'), 'error');
+      }
+    });
+
+    // Search/filter functionality
+    const adminContainer = document.querySelector('.container');
+    const searchDiv = document.createElement('div');
+    searchDiv.style.margin = '20px 0';
+    searchDiv.innerHTML = `
+      <input id="userSearch" type="text" placeholder="Search users..." style="margin-right:10px; padding:6px; border-radius:6px; border:1px solid #ccc;">
+      <input id="appointmentSearch" type="text" placeholder="Search appointments..." style="padding:6px; border-radius:6px; border:1px solid #ccc;">
+    `;
+    adminContainer.insertBefore(searchDiv, adminContainer.children[1]);
+    document.getElementById('userSearch').addEventListener('input', e => loadUsers(e.target.value));
+    document.getElementById('appointmentSearch').addEventListener('input', e => loadAppointments(e.target.value));
+
+    // For demo: load appointments from PHP if not in localStorage
+    if (!localStorage.getItem('appointments')) {
+      fetch('get_appointments.php')
+        .then(r => r.json())
+        .then(data => {
+          localStorage.setItem('appointments', JSON.stringify(data));
+          loadAppointments();
+        })
+        .catch(() => loadAppointments());
+    } else {
+      loadAppointments();
+    }
+    loadUsers();
+    loadFeedback();
+  });
+
+
+function closeModal() {
+  document.getElementById('modalBg').style.display = 'none';
+}
+
+// Spinner show/hide utility
+function showSpinner() {
+  document.getElementById('spinner').style.display = 'flex';
+}
+function hideSpinner() {
+  document.getElementById('spinner').style.display = 'none';
+}
+
+// Toast notification
+function showToast(message, type = 'success') {
+  let toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '30px';
+  toast.style.right = '30px';
+  toast.style.background = type === 'success' ? '#4caf50' : '#ff5252';
+  toast.style.color = '#fff';
+  toast.style.padding = '14px 28px';
+  toast.style.borderRadius = '8px';
+  toast.style.fontSize = '1.1rem';
+  toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.12)';
+  toast.style.zIndex = 9999;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = 0; setTimeout(()=>toast.remove(), 400); }, 2200);
+}
+</script>
+
+</body>
+</html>

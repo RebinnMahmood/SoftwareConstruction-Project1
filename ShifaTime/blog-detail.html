@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShifaTime - Blog Detail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  
+  <header>
+  <div class="container header-container">
+    <a href="index.html" class="logo">Shifa<span>Time</span></a>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="doctors.html">Doctors</a></li>
+        <li><a href="blogs.html" class="active">Blogs</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions" id="authSection">
+      <a href="login.html" class="btn btn-outline">Login</a>
+      <a href="login.html" class="btn btn-primary">Book Now</a>
+    </div>
+  </div>
+</header>
+
+  <section class="page-hero">
+    <div class="container">
+      <h1 id="blogTitle">Blog Detail</h1>
+      <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo;
+        <a href="blogs.html">Blogs</a> &raquo;
+        <span id="breadcrumbBlog">Blog</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="container content-wrapper">
+    <article class="blog-post" id="blogPost">
+      <!-- Filled dynamically -->
+    </article>
+
+    <aside class="sidebar">
+      <h3>Latest Blogs</h3>
+      <ul class="latest-list">
+        <li>
+          <img src="assets/images/blog1.jpg" alt="">
+          <div>
+            <a href="blog-detail.html?blog=neurology">Ask a Top Neurologist…</a><br>
+            <span>1 year ago</span>
+          </div>
+        </li>
+        <li>
+          <img src="assets/images/blog2.jpg" alt="">
+          <div>
+            <a href="blog-detail.html?blog=dental">Healthy Teeth Tips…</a><br>
+            <span>1 year ago</span>
+          </div>
+        </li>
+        <li>
+          <img src="assets/images/blog3.jpg" alt="">
+          <div>
+            <a href="blog-detail.html?blog=eye">Protect Your Vision…</a><br>
+            <span>1 year ago</span>
+          </div>
+        </li>
+        <li>
+          <img src="assets/images/blog4.jpg" alt="">
+          <div>
+            <a href="blog-detail.html?blog=ent">ENT Health Tips…</a><br>
+            <span>1 year ago</span>
+          </div>
+        </li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="container">
+    <div class="emergency-bar">
+      <div class="emergency-item"><i class="fas fa-phone-alt"></i> Emergency Call (+964)7701475201</div>
+      <div>OR</div>
+      <div class="emergency-item"><i class="fas fa-envelope"></i> info@shifatime.com</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="col">
+        <h4>ShifaTime</h4>
+        <p>Providing exceptional healthcare since 2025.</p>
+      </div>
+      <div class="col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="doctors.html">Doctors</a></li>
+          <li><a href="blogs.html">Blogs</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <p>Erbil</p>
+        <p>Phone: (+964)7701475201</p>
+        <p>Email: info@shifatime.com</p>
+        <p>info@shifatime.com</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const blogs = {
+      neurology: {
+        title: "Ask a Top Neurologist: Dr Hadi Manji",
+        image: "assets/images/blog1.jpg",
+        date: "2023-06-20 09:45:00",
+        views: 215,
+        content: `
+          <p>A neurologist specializes in treating disorders of the nervous system including the brain, spine, and nerves.</p>
+          <p>Dr. Hadi Manji shares insights on when to consult a neurologist, common symptoms, and preventive care tips.</p>
+          <p>Topics include migraines, epilepsy, and neurological checkups.</p>
+        `
+      },
+      dental: {
+        title: "Tips for Healthy Teeth from Dr Lisa Morgan",
+        image: "assets/images/blog2.jpg",
+        date: "2024-07-05 14:30:00",
+        views: 162,
+        content: `
+          <p>Good dental hygiene starts with regular brushing and flossing. Avoid sugary drinks and visit your dentist twice a year.</p>
+          <p>Dr. Lisa Morgan discusses dental myths, tooth sensitivity, and how to care for your smile long-term.</p>
+        `
+      },
+      eye: {
+        title: "Protect Your Vision with Dr John Carter",
+        image: "assets/images/blog3.jpg",
+        date: "2025-08-01 12:00:00",
+        views: 198,
+        content: `
+          <p>Your eyes need rest, protection from UV light, and regular checkups to stay healthy.</p>
+          <p>Dr. John Carter shares tips on reducing digital strain, preventing eye disease, and proper eyewear.</p>
+        `
+      },
+      ent: {
+        title: "Ear, Nose, and Throat Care with Dr Ahmed Khan",
+        image: "assets/images/blog4.jpg",
+        date: "2025-09-10 11:15:00",
+        views: 174,
+        content: `
+          <p>ENT problems like sinus infections, earaches, and sore throats can impact your daily life.</p>
+          <p>Dr. Ahmed Khan explains when to seek help and how to maintain ENT health through hygiene and care.</p>
+        `
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const blogId = params.get("blog");
+    const post = document.getElementById("blogPost");
+
+    if (blogId && blogs[blogId]) {
+      const blog = blogs[blogId];
+      document.getElementById("blogTitle").innerText = blog.title;
+      document.getElementById("breadcrumbBlog").innerText = blog.title;
+      post.innerHTML = `
+        <img src="${blog.image}" alt="${blog.title}">
+        <h2>${blog.title}</h2>
+        <div class="blog-meta">
+          <i class="fas fa-calendar-alt"></i> ${blog.date} &nbsp; | &nbsp;
+          <i class="fas fa-eye"></i> ${blog.views} views
+        </div>
+        <div class="blog-content">${blog.content}</div>
+        <div class="share-on">Share On:</div>
+        <div class="share-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-pinterest-p"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+      `;
+    } else {
+      post.innerHTML = '<h2>Blog Not Found</h2><p>The blog you are looking for does not exist.</p>';
+    }
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

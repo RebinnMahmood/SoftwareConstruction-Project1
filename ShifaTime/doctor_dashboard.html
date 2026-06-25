@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Doctor Dashboard - Appointments</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f9f9f9;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #ff6b6b;
+      color: white;
+    }
+
+    td {
+      background-color: #fff;
+    }
+
+    .no-appointments {
+      text-align: center;
+      color: #777;
+      font-style: italic;
+      margin-top: 2rem;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      text-align: right;
+    }
+
+    .logout-btn button {
+      background: #ff6b6b;
+      color: #fff;
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .logout-btn button:hover {
+      opacity: 0.9;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.7rem 1.2rem;
+      border: 2px solid #ff6b6b;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      color: #ff6b6b;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .btn:hover {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    /* Toast notification styles */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.4s;
+    }
+
+    .toast-success {
+      background: #4caf50;
+      color: #fff;
+    }
+
+    .toast-error {
+      background: #ff5252;
+      color: #fff;
+    }
+
+    /* Spinner styles */
+    .spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 9998;
+      display: none;
+    }
+
+    .spinner svg {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Status badge styles */
+    .status-badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .status-pending {
+      background: #ffe082;
+      color: #b26a00;
+    }
+
+    .status-confirmed {
+      background: #b9f6ca;
+      color: #00695c;
+    }
+
+    .status-cancelled {
+      background: #eee;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Doctor Dashboard - Appointments</h2>
+
+    <div class="logout-btn">
+      <a href="profile.html" class="btn btn-outline" style="margin-right: 1rem;">Edit Profile</a>
+      <button onclick="logoutDoctor()">Logout</button>
+    </div>
+
+    <div id="appointments-container">
+      <!-- Appointment table will be inserted here -->
+    </div>
+  </div>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const appointmentsContainer = document.getElementById("appointments-container");
+
+    // Toast notification
+    function showToast(message, type = 'success') {
+      let toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '30px';
+      toast.style.right = '30px';
+      toast.style.background = type === 'success' ? '#4caf50' : '#ff5252';
+      toast.style.color = '#fff';
+      toast.style.padding = '14px 28px';
+      toast.style.borderRadius = '8px';
+      toast.style.fontSize = '1.1rem';
+      toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.12)';
+      toast.style.zIndex = 9999;
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = 0; setTimeout(()=>toast.remove(), 400); }, 2200);
+    }
+
+    // Spinner
+    let spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    spinner.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;"><svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" stroke="#ff6b6b" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="60"><animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="1s" repeatCount="indefinite"/></circle></svg></div>';
+    spinner.style.position = 'fixed';
+    spinner.style.top = '50%';
+    spinner.style.left = '50%';
+    spinner.style.transform = 'translate(-50%,-50%)';
+    spinner.style.zIndex = 9998;
+    spinner.style.display = 'none';
+    document.body.appendChild(spinner);
+    function showSpinner() { spinner.style.display = 'block'; }
+    function hideSpinner() { spinner.style.display = 'none'; }
+
+    async function showAppointments() {
+      if (!currentUser || currentUser.role !== "doctor") {
+        appointmentsContainer.innerHTML = "<p class='no-appointments'>Access Denied. Please log in as a doctor.</p>";
+        return;
+      }
+      showSpinner();
+      let allAppointments = [];
+      try {
+        const res = await fetch('get_appointments.php');
+        allAppointments = await res.json();
+      } catch {
+        hideSpinner();
+        appointmentsContainer.innerHTML = "<p class='no-appointments'>Failed to load appointments.</p>";
+        showToast('Failed to load appointments', 'error');
+        return;
+      }
+      // Filter only appointments for the logged-in doctor by doctor_id
+      const doctorAppointments = allAppointments.filter(a =>
+        a.doctor_id == currentUser.id
+      );
+      hideSpinner();
+      if (doctorAppointments.length === 0) {
+        appointmentsContainer.innerHTML = "<p class='no-appointments'>No appointments found for you.</p>";
+        return;
+      }
+      let tableHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Patient Name</th>
+              <th>Date/Slot</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Details</th>
+              <th>Status</th>
+              <th>Fee</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      doctorAppointments.forEach(app => {
+        // Modern status badge
+        let badge = '';
+        if(app.status==='Pending') badge = `<span class='status-badge status-pending'>Pending</span>`;
+        else if(app.status==='Confirmed') badge = `<span class='status-badge status-confirmed'>Confirmed</span>`;
+        else if(app.status==='Cancelled') badge = `<span class='status-badge status-cancelled'>Cancelled</span>`;
+        else badge = `<span>${app.status||''}</span>`;
+        tableHTML += `
+          <tr>
+            <td>${app.patient_name}</td>
+            <td>${app.slot || ''}</td>
+            <td>${app.email}</td>
+            <td>${app.phone}</td>
+            <td>${app.details}</td>
+            <td>${badge}</td>
+            <td>${app.fee}</td>
+          </tr>
+        `;
+      });
+      tableHTML += "</tbody></table>";
+      appointmentsContainer.innerHTML = tableHTML;
+    }
+    function logoutDoctor() {
+      localStorage.removeItem("currentUser");
+      showToast('Logged out successfully', 'success');
+      setTimeout(()=>window.location.href = "login.html", 800);
+    }
+    showAppointments();
+  </script>
+</body>
+</html>

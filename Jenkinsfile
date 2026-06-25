@@ -18,7 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image for ShifaTime...'
-                sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                bat 'docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .'
             }
         }
 
@@ -30,8 +30,8 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
+                    bat 'docker push %DOCKER_IMAGE%:%DOCKER_TAG%'
                 }
             }
         }
@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying ShifaTime application...'
-                sh 'docker compose up -d --build'
+                bat 'docker compose up -d --build'
             }
         }
 

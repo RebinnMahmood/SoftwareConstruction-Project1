@@ -4,6 +4,9 @@ pipeline {
     environment {
         DOCKER_IMAGE = "rebinmahmood/shifatime"
         DOCKER_TAG = "latest"
+        JMETER_HOME = "C:\\apache-jmeter-5.6.3"
+        TEST_PLAN = "${WORKSPACE}\\test-plan.jmx"
+        RESULTS_FILE = "${WORKSPACE}\\results.jtl"
     }
 
     stages {
@@ -43,11 +46,23 @@ pipeline {
             }
         }
 
+        stage('Performance Test') {
+            steps {
+                echo 'Running JMeter Performance Tests...'
+                bat '"%JMETER_HOME%\\bin\\jmeter.bat" -n -t "%TEST_PLAN%" -l "%RESULTS_FILE%"'
+            }
+            post {
+                always {
+                    perfReport sourceDataFiles: 'results.jtl'
+                }
+            }
+        }
+
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully! ShifaTime is deployed.'
+            echo 'Pipeline completed successfully! ShifaTime is deployed and tested.'
         }
         failure {
             echo 'Pipeline failed. Please check the logs above.'
